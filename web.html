@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link
+      href="https://fonts.googleapis.com/css?family=Source Sans Pro"
+      rel="stylesheet"
+    />
+
+    <!-- firebase -->
+</head>
+<style>
+
+#mydiv {
+  position: absolute;
+  z-index: 9;
+  text-align: center;
+  cursor: move;
+}
+
+.mydiv:hover{
+  background-color: #d91111;
+}
+
+ribbon:hover{
+    background-color: yellow;
+}
+
+#scissor {
+  width: 25%;
+ 
+}
+
+#ribbon{
+    width: 100%;
+}
+
+body {
+        font-family: "Source Sans Pro";
+        font-size: 32px;
+        text-align: center;
+      }
+
+
+</style>
+
+<body>
+
+<h1>Drag the scissor to cut the ribbon!</h1>
+
+<div id="original-ribbon" id = "myImg">
+    <img id="ribbon" src="ribbon.jpeg">
+</div>
+
+<div id="mydiv">
+    <img id="scissor" src="scissor.png">
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyDubnu0IrW-QXclNcFNc1b0zzziEhtH7xQ",
+        authDomain: "i-lab-siccors.firebaseapp.com",
+        databaseURL: "https://i-lab-siccors-default-rtdb.firebaseio.com",
+        projectId: "i-lab-siccors",
+        storageBucket: "i-lab-siccors.appspot.com",
+        messagingSenderId: "672254140311",
+        appId: "1:672254140311:web:c1a2b21c633a0cb52e2ed2",
+        measurementId: "G-67G663KEZQ",
+      };
+
+      firebase.initializeApp(firebaseConfig);
+
+      var messagesRef = firebase.database().ref("Collected Data");
+
+      var isRun = false;
+
+      // document
+      //   .getElementById("contactForm")
+      //   .addEventListener("submit", submitForm);
+
+      function submitForm(e) {
+        console.log("in submit form");
+        // e.preventDefault();
+
+        // Get values
+        var name = "getInputVal('name')";
+        var email = "getInputVal('email')";
+
+        saveMessage(name, email);
+        //document.getElementById("contactForm").reset();
+      }
+
+      // Function to get form values
+      function getInputVal(id) {
+        return document.getElementById(id).value;
+      }
+
+      // Save message to firebase
+      function saveMessage(name, email) {
+        if(isRun == false){
+          isRun = true;
+          // Reference to the value you want to increment
+          var valueRef = firebase.database().ref("clicks");
+
+          // Increment the value by 1
+          valueRef.transaction(function (currentValue) {
+            return currentValue + 1;
+          });
+        }
+      }
+  
+//Make the DIV element draggagle:
+dragElement(document.getElementById("mydiv"));
+
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    elmnt.onmousedown = dragMouseDown;
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    var offsets = document.getElementById('original-ribbon').getBoundingClientRect();
+    var top = offsets.top;
+    var left = offsets.left;
+    var right = offsets.right;
+    var bottom = offsets.bottom;
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    // console.log(pos1, pos2, pos3, pos4)
+    
+    if(pos3>left && pos3<right){
+        if (pos4>top && pos4<bottom){
+            console.log(top);
+            console.log(left);
+            console.log(right);
+            ribbon.src = "ribbon-cut.jpeg"
+            submitForm();
+            console.log("submitted!")
+        }
+    }
+  }
+
+  function closeDragElement() {
+    /* stop moving when mouse button is released:*/
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
+</script>
+
+
+</body>
+</html>
